@@ -64,6 +64,28 @@ func SetActivity(activity Activity) error {
 	return nil
 }
 
+func ClearActivity() error {
+	if !logged {
+		return nil
+	}
+
+	payload, err := json.Marshal(Frame{
+		"SET_ACTIVITY",
+		Args{
+			os.Getpid(),
+			nil,
+		},
+		getNonce(),
+	})
+
+	if err != nil {
+		return err
+	}
+
+	ipc.Send(1, string(payload))
+	return nil
+}
+
 func getNonce() string {
 	buf := make([]byte, 16)
 	_, err := rand.Read(buf)
